@@ -1,10 +1,20 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from app import models, database, scoring, assistant
 from pydantic import BaseModel
 from typing import List
 
 app = FastAPI(title="EquiScore Backend")
+
+# --- CORS FIX: This allows Vercel to talk to your local server ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # Allows all origins (perfect for hackathons)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Create database tables
 models.Base.metadata.create_all(bind=database.engine)
