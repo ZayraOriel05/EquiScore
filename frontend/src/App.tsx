@@ -8,7 +8,7 @@ import type { UserData } from "./api";
 const USER_ID = 1;
 
 // Set to false to use the real backend
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 const MOCK_USER: UserData = {
   user: "Amina K.",

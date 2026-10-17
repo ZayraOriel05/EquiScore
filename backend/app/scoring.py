@@ -1,7 +1,6 @@
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
 import numpy as np
-
+from sklearn.ensemble import RandomForestClassifier
+ 
 # In a real app, this would load a saved .joblib model file.
 # For the prototype, we'll create a simple model that learns from a small set of alternative data.
 class CreditScorer:
@@ -15,12 +14,18 @@ class CreditScorer:
             [10, 0.2, 50, 30],   # High risk
         ])
         self.y_train = np.array([1, 0, 1, 1, 0]) # 1 = likely to repay, 0 = risk
-        self.model = RandomForestClassifier(n_estimators=10)
+        # random_state keeps scores identical across server restarts.
+        self.model = RandomForestClassifier(n_estimators=10, random_state=42)
         self.model.fit(self.X_train, self.y_train)
-
+ 
     def predict_score(self, data):
         # data: [MobileMoneyUsage, UtilityPaymentConsistency, BusinessCashFlow, PsychometricScore]
         prediction = self.model.predict_proba([data])[0][1] # Probability of class 1
         return round(prediction * 100, 2) # Return as a score out of 100
-
+ 
+    def predict_credit_score(self, data):
+        """Same prediction on the 300-850 scale the dashboard gauge uses."""
+        return round(300 + self.predict_score(data) / 100 * 550)
+ 
 scorer = CreditScorer()
+ 
