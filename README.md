@@ -1,5 +1,4 @@
-**EquiScore - FinTech Project for AI-Powered Credit Scoring Model
-**
+## EquiScore - FinTech Project for AI-Powered Credit Scoring Model
 
 Themes: Credit Score, Microfinance, Train AI 
 
@@ -19,7 +18,7 @@ africa , pacific, latin america
 Because they do NOT have banks, no brick and mortar, need financing 
 
 
-4 conditions 
+4. Conditions 
 Exclusion from traditional banks  because of low credit history 
 Lack of standard collateral, don't meet minimum balance requirements (funding) 
 microloan , focus on income generation, borrowers look from micro loan to buy basic tools to create revenue
@@ -46,9 +45,9 @@ X amount repaid
 
 
 AI Chatbot 
-
 It is trained on user’s past bad habits to teach them how to better manage or handle their finance 
 Acts as a personal guide or someone to keep you accountable 
+
 Outputs:
 What should I do in this situation? 
 Reminders: eg. repay loan, save this much, 
