@@ -1,261 +1,229 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  LayoutDashboard, 
-  MessageSquare, 
-  Bot, 
-  User, 
-  TrendingUp, 
-  Wallet, 
-  Calendar,
-  Send,
-  ArrowUpRight,
-  CheckCircle2
-} from 'lucide-react';
+import React, { useEffect, useRef, useState } from "react";
 import { fetchLoanDetails, chatWithAssistant, UserData } from './api';
+import './App.css';
 
-// --- THE BEAUTY: Styled Components using Tailwind ---
+// --- HELPER: CountUp Animation ---
+function CountUp({ to, duration = 1450, decimals = 0 }: { to: number; duration?: number; decimals?: number }) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    let start: number | null = null;
+    const animate = (now: number) => {
+      if (start === null) start = now;
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(to * eased);
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    const frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [to, duration]);
+  return <>{value.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}</>;
+}
 
-const StatCard = ({ label, value, icon: Icon }: any) => (
-  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 space-y-2 hover:shadow-md transition-shadow">
-    <div className="flex justify-between items-center">
-      <span className="text-gray-400 text-xs font-bold uppercase tracking-wider">{label}</span>
-      <Icon size={18} className="text-brandGreen" />
-    </div>
-    <div className="text-2xl font-black text-gray-800">{value}</div>
-  </div>
-);
-
-const DashboardView = ({ data }: { data: UserData | null }) => {
-  return (
-    <div className="p-8 space-y-8 animate-in fade-in duration-700">
-      {/* Header: Figma Section 1 */}
-      <header className="flex justify-between items-center mb-12">
-        <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight">Welcome Back, {data?.user || 'Borrower'}!</h1>
-          <p className="text-gray-500 text-lg">Here is your account overview</p>
-        </div>
-        <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
-          <div className="w-10 h-10 bg-brandGreen rounded-full flex items-center justify-center text-white">
-            <User size={20} />
-          </div>
-          <span className="font-bold text-gray-800 pr-2">{data?.user || 'Demo User'}</span>
-        </div>
-      </header>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Credit Score Gauge: The "Ring" from Figma */}
-        <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center space-y-6">
-          <h3 className="text-gray-400 font-bold uppercase tracking-widest text-xs">Current Credit Score</h3>
-          <div className="relative w-40 h-40 flex items-center justify-center">
-            <svg className="w-full h-full transform -rotate-90">
-              <circle cx="80" cy="80" r="70" stroke="#F3F4F6" strokeWidth="16" fill="transparent" />
-              <circle cx="80" cy="80" r="70" stroke="#1A4D32" strokeWidth="16" fill="transparent" 
-                      strokeDasharray={440} strokeDashoffset={440 - (440 * 640) / 850} strokeLinecap="round" />
-            </svg>
-            <div className="absolute flex flex-col items-center">
-              <span className="text-5xl font-black text-gray-900">640</span>
-              <span className="text-xs font-bold text-brandGreen uppercase">Good</span>
-            </div>
-          </div>
-          <p className="text-sm text-gray-400">Your score is based on alternative indicators.</p>
-        </div>
-
-        {/* Loan Balance Card: The Deep Green Box */}
-        <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-6">
-          <div className="flex justify-between items-center">
-            <h3 className="text-gray-400 font-bold uppercase tracking-widest text-xs">Loan Balance</h3>
-            <Wallet className="text-brandGreen" size={20} />
-          </div>
-          <div className="bg-brandGreen p-8 rounded-[2rem] text-white text-center shadow-inner">
-            <div className="text-4xl font-black">${data?.loan_balance || '1,967.00'}</div>
-            <div className="text-xs opacity-70 mt-1">Outstanding Balance</div>
-          </div>
-          <div className="space-y-3">
-            <div className="flex justify-between text-sm font-bold">
-              <span className="text-gray-500">Repaid: 10%</span>
-              <span className="text-brandGreen">${(data?.loan_balance || 1967) * 0.1}</span>
-            </div>
-            <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden">
-              <div className="bg-brandGreen h-full w-[10%] transition-all duration-1000" />
-            </div>
-          </div>
-        </div>
-
-        {/* Stats Group */}
-        <div className="grid grid-cols-1 gap-4">
-          <StatCard label="Monthly Income" value={`$${data?.income || '10,000'}`} icon={TrendingUp} />
-          <StatCard label="Total Savings" value={`$${data?.savings || '500'}`} icon={Wallet} />
-        </div>
-      </div>
-
-      {/* Upcoming Payments Table */}
-      <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-        <div className="flex justify-between items-center mb-8">
-          <h3 className="text-2xl font-black text-gray-900 flex items-center gap-3">
-            <Calendar className="text-brandGreen" size={28} />
-            Upcoming Loan Payments
-          </h3>
-          <button className="text-brandGreen text-sm font-bold flex items-center gap-1 hover:underline">
-            Manage All <ArrowUpRight size={16} />
-          </button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="text-gray-400 text-sm border-b border-gray-100">
-                <th className="pb-4 font-bold">Date</th>
-                <th className="pb-4 font-bold">Amount</th>
-                <th className="pb-4 font-bold">Status</th>
-                <th className="pb-4 font-bold text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              <tr className="hover:bg-gray-50 transition">
-                <td className="py-4 font-medium">Oct 17, 2026</td>
-                <td className="py-4 font-bold text-brandGreen">$100.00</td>
-                <td className="py-4">
-                  <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Pending</span>
-                </td>
-                <td className="py-4 text-right">
-                  <button className="px-5 py-2 bg-brandGreen text-white rounded-xl text-xs font-bold hover:shadow-md transition">Pay Now</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
+type Insight = { id: string; title: string; description: string };
+type PlanStep = { id: string; title: string; description: string; completed: boolean };
+type FinancialPlan = {
+  id: string;
+  name: string;
+  category: 'savings' | 'repayment' | 'credit' | 'other';
+  durationMonths: number;
+  steps: PlanStep[];
+  summary: { label: string; value: string; note?: string };
+};
+type AIResponse = {
+  reply: string;
+  action: 'chat_reply' | 'insights_updated' | 'plan_created' | 'plan_updated' | 'plan_deleted';
+  insights?: Insight[];
+  plan?: FinancialPlan;
+  deletedPlanId?: string;
 };
 
-const AssistantView = ({ userId }: { userId: number }) => {
-  const [messages, setMessages] = useState([
-    { role: 'ai', text: 'Welcome to your AI Financial Coach. I have analyzed your dashboard. How can I help you grow your business today?' }
-  ]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSend = async (text: string) => {
-    const msg = text || input;
-    if (!msg.trim()) return;
-    setMessages(prev => [...prev, { role: 'user', text: msg }]);
-    if (text) setInput('');
-    setLoading(true);
-
-    try {
-      const response = await chatWithAssistant(userId, msg);
-      setMessages(prev => [...prev, { role: 'ai', text: response.response }]);
-    } catch (e) {
-      setMessages(prev => [...prev, { role: 'ai', text: 'Sorry, I am having trouble connecting to my brain. Please check the server!' }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="p-8 h-full flex gap-8 animate-in slide-in-from-bottom-4 duration-500">
-      <div className="flex-1 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col overflow-hidden">
-        <div className="p-6 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brandGreen rounded-full flex items-center justify-center text-white">
-              <Bot size={20} />
-            </div>
-            <span className="font-black text-lg text-gray-900">AI Financial Coach</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs font-bold text-brandGreen bg-green-100 px-3 py-1 rounded-full">
-            <span className="w-2 h-2 bg-brandGreen rounded-full animate-pulse" />
-            Live Analysis
-          </div>
-        </div>
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {messages.map((m, i) => (
-            <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[70%] p-4 rounded-2xl ${m.role === 'user' ? 'bg-brandGreen text-white rounded-tr-none shadow-sm' : 'bg-gray-100 text-gray-800 rounded-tl-none'}`}>
-                <p className="text-sm leading-relaxed">{m.text}</p>
-              </div>
-            </div>
-          ))}
-          {loading && <div className="text-xs text-gray-400 italic ml-2">Coach is analyzing your data...</div>}
-        </div>
-        <div className="p-6 border-t border-gray-100 flex gap-4 bg-white">
-          <input 
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend(input)}
-            type="text" 
-            placeholder="Ask about your budget..." 
-            className="flex-1 p-4 rounded-2xl border border-gray-200 outline-none focus:ring-2 focus:ring-brandGreen transition bg-gray-50"
-          />
-          <button onClick={() => handleSend(input)} className="p-4 bg-brandGreen text-white rounded-2xl hover:shadow-lg transition active:scale-95">
-            <Send size={24} />
-          </button>
-        </div>
-      </div>
-      <div className="w-96 space-y-6">
-        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-6">
-          <h3 className="font-black text-xl text-gray-900 flex items-center gap-2">
-            <MessageSquare className="text-brandGreen" size={24} />
-            Quick Questions
-          </h3>
-          <div className="space-y-3">
-            {[
-              { q: "Recommend a plan to get rid of my debt", icon: <TrendingUp size={16}/> },
-              { q: "How can I increase my credit score?", icon: <TrendingUp size={16}/> },
-              { q: "Create a budgeting plan for my business", icon: <Wallet size={16}/> },
-              { q: "What are the best savings goals for me?", icon: <CheckCircle2 size={16}/> },
-            ].map((item, i) => (
-              <button 
-                key={i} 
-                onClick={() => handleSend(item.q)}
-                className="w-full text-left p-4 rounded-2xl bg-gray-50 border border-transparent hover:border-brandGreen hover:bg-green-50 transition-all group flex items-center gap-3"
-              >
-                <div className="p-2 bg-white rounded-lg text-brandGreen group-hover:bg-brandGreen group-hover:text-white transition">
-                  {item.icon}
-                </div>
-                <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900">{item.q}</span>
-              </button>
-            ))}
-          </div>
-          <div className="mt-8 p-6 bg-brandGreen text-white rounded-3xl relative overflow-hidden shadow-lg">
-            <div className="relative z-10">
-              <p className="text-xs font-bold uppercase opacity-70 mb-1">AI Insight</p>
-              <p className="text-lg font-bold leading-tight">Your ability to save $500 suggests high potential for credit growth!</p>
-            </div>
-            <div className="absolute -right-4 -bottom-4 opacity-20 rotate-12">
-              <Bot size={80} />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+const initialInsights: Insight[] = [
+  { id: 'debt', title: 'DEBT REPAYMENT', description: 'You have been consistently meeting deadlines. See how you can adjust your habits to meet your goals.' },
+  { id: 'savings', title: 'SAVINGS BALANCE', description: 'You are on track to meet your saving goals. Keep it up!' },
+  { id: 'advice', title: 'FINANCIAL ADVICE', description: 'You seem to be generating more income. See how this could help your credit score.' },
+];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'helper' | 'assistant'>('dashboard');
+  // --- BACKEND STATE ---
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [chatMessages, setChatMessages] = useState<{ sender: 'user' | 'assistant'; text: string }[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
+  // --- UI STATE ---
+  const [showLoanDetails, setShowLoanDetails] = useState(false);
+  const [page, setPage] = useState<'dashboard' | 'helper'>('dashboard');
+  const [chatText, setChatText] = useState('');
+  const [helperTab, setHelperTab] = useState<'questions' | 'plans'>('questions');
+  const [insights, setInsights] = useState<Insight[]>(initialInsights);
+  const [plans, setPlans] = useState<FinancialPlan[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [plansMenuOpen, setPlansMenuOpen] = useState(false);
+
+  // 1. FETCH REAL DATA ON LOAD
   useEffect(() => {
-    fetchLoanDetails(1)
-      .then(setUserData)
-      .catch(err => console.error('Error loading data:', err));
+    fetchLoanDetails(1).then(setUserData).catch(console.error);
   }, []);
 
+  // 2. REAL AI CHAT HANDLER (Replaced mockBackendResponse)
+  async function sendChat(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const question = chatText.trim();
+    if (!question || isGenerating) return;
+
+    setChatMessages(old => [...old, { sender: 'user', text: question }]);
+    setChatText('');
+    setIsGenerating(true);
+
+    try {
+      const response = await chatWithAssistant(1, question);
+      setChatMessages(prev => [...prev, { sender: 'assistant', text: response.response }]);
+    } catch (e) {
+      setChatMessages(prev => [...prev, { sender: 'assistant', text: "Sorry, I'm having trouble connecting to my brain. Please check the server!" }]);
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
+  function deletePlan(id: string) {
+    setPlans(prev => prev.filter(p => p.id !== id));
+    if (selectedPlanId === id) setSelectedPlanId(null);
+  }
+
   return (
-    <div className="min-h-screen bg-brandLightGreen flex font-sans">
-      <nav className="w-24 bg-white border-r border-gray-100 flex flex-col items-center py-10 space-y-10 shadow-sm">
-        <div className="w-14 h-14 bg-brandGreen rounded-2xl flex items-center justify-center text-white mb-6 shadow-xl rotate-3">
-          <span className="font-black text-2xl">ES</span>
-        </div>
-        <button onClick={() => setActiveTab('dashboard')} className={`p-4 rounded-2xl transition-all ${activeTab === 'dashboard' ? 'bg-brandGreen text-white shadow-lg scale-110' : 'text-gray-400 hover:bg-gray-50'}`}><LayoutDashboard size={28} /></button>
-        <button onClick={() => setActiveTab('helper')} className={`p-4 rounded-2xl transition-all ${activeTab === 'helper' ? 'bg-brandGreen text-white shadow-lg scale-110' : 'text-gray-400 hover:bg-gray-50'}`}><MessageSquare size={28} /></button>
-        <button onClick={() => setActiveTab('assistant')} className={`p-4 rounded-2xl transition-all ${activeTab === 'assistant' ? 'bg-brandGreen text-white shadow-lg scale-110' : 'text-gray-400 hover:bg-gray-50'}`}><Bot size={28} /></button>
-      </nav>
-      <main className="flex-1 overflow-hidden">
-        {activeTab === 'dashboard' && <DashboardView data={userData} />}
-        {activeTab === 'helper' && <div className="p-8 text-center text-gray-500 mt-20 font-bold">AI Helper is now integrated into the Assistant View. Click the Bot icon!</div>}
-        {activeTab === 'assistant' && <AssistantView userId={1} />}
+    <div className="dashboard-frame">
+      {page === 'dashboard' ? (
+      <main className="dashboard-canvas" key="dashboard-animated">
+        <header className="welcome-heading">
+          <h1>Welcome Back, {userData?.user || 'Borrower'}!</h1>
+          <p>Here’s your account overview</p>
+        </header>
+        <div className="vertical-divider" aria-hidden="true" />
+
+        <section className="loan-card" aria-label="Current loan">
+          <div className="loan-card-meta"><span>{userData?.user || 'User Name'}</span><span>Microfinancer</span></div>
+          <div className="loan-balance">
+            <div className="balance-amount"><span className="currency">$</span><CountUp to={userData?.loan_balance || 1967} /><span className="cents">.00</span></div>
+            <span className="balance-label">Outstanding Balance</span>
+          </div>
+          <button className="loan-details" onClick={() => setShowLoanDetails(true)}>See loan details <span aria-hidden="true">⟶</span></button>
+        </section>
+
+        <section className="repaid-card" aria-label="Loan repayment progress">
+          <div className="repaid-title">You have paid <strong><CountUp to={10} />%</strong> of your loan</div>
+          <div className="repaid-values"><span>${(userData?.loan_balance || 5000) * 0.1} repaid</span><span>${userData?.loan_balance || 5000} loan</span></div>
+          <div className="repaid-track" role="progressbar" aria-label="Loan repaid" aria-valuemin={0} aria-valuemax={100} aria-valuenow={10}><div className="repaid-fill" /></div>
+        </section>
+
+        <section className="score-card" aria-label="Credit score">
+          <svg className="score-arc" viewBox="0 0 220 126" role="img" aria-label="Credit score gauge">
+            <path d="M 12 113 A 98 98 0 0 1 208 113" fill="none" stroke="#E1E1E1" strokeWidth="16" />
+            <path d="M 12 113 A 98 98 0 0 1 100 15" fill="none" stroke="#789584" strokeWidth="16" strokeLinecap="round" pathLength={100} />
+          </svg>
+          <div className="score-text">
+            <span className="score-value"><CountUp to={640} duration={1700} /></span>
+            <span className="score-label">Credit Score</span>
+            <span className="score-arrow" aria-hidden="true">⟶</span>
+          </div>
+        </section>
+
+        <section className="repayment-due" aria-label="Upcoming loan payments">
+          <h2 className="repayment-heading">UPCOMING LOAN PAYMENTS</h2>
+          <div className="repayment-content">
+            <div className="date-badge"><span>Oct</span><span>17</span></div>
+            <div className="due-balance"><span>$ <CountUp to={100} decimals={2} /></span></div>
+          </div>
+        </section>
+
+        <section className="mini-stat savings" aria-label="Savings">
+          <span className="stat-heading">SAVINGS</span>
+          <strong className="stat-amount"><span className="stat-currency">$</strong><CountUp to={userData?.savings || 500} /><span className="stat-cents">.00</span></strong>
+        </section>
+        <section className="mini-stat income" aria-label="Income">
+          <span className="stat-heading">INCOME</span>
+          <strong className="stat-amount"><span className="stat-currency">$</strong><CountUp to={userData?.income || 10000} /><span className="stat-cents">.00</span></strong>
+        </section>
       </main>
+      ) : (
+      <main className="helper-canvas">
+        <section className="helper-chat-panel" aria-label="AI Helper chat">
+          <h1>What Are We<br />Learning Today?</h1>
+          <div className="helper-chat-history" aria-live="polite">
+            {chatMessages.map((message, index) => (
+              <p key={index} className={`helper-message helper-message-${message.sender}`}>{message.text}</p>
+            ))}
+            {isGenerating && <p className="helper-message helper-message-assistant">AI is thinking...</p>}
+          </div>
+          <form className="helper-chat-form" onSubmit={sendChat}>
+            <input
+              aria-label="Ask me anything"
+              placeholder="Ask me anything..."
+              value={chatText}
+              onChange={event => setChatText(event.target.value)}
+            />
+            <button aria-label="Send message" type="submit" />
+          </form>
+        </section>
+        <section className="helper-insights-panel" aria-label="Financial insights and plans">
+          <div className="helper-tabs" role="tablist" aria-label="AI Helper results">
+            <button id="helper-questions-tab" type="button" role="tab" aria-selected={helperTab === 'questions'} aria-controls="helper-results" className={helperTab === 'questions' ? 'helper-tab active' : 'helper-tab'} onClick={() => { setHelperTab('questions'); setPlansMenuOpen(false); }}>Questions</button>
+            <div className="helper-plans-menu" onMouseEnter={() => setPlansMenuOpen(true)} onMouseLeave={() => setPlansMenuOpen(false)}>
+              <button id="helper-plans-tab" type="button" role="tab" aria-selected={helperTab === 'plans'} aria-controls="helper-results" aria-expanded={plansMenuOpen} className={helperTab === 'plans' ? 'helper-tab active' : 'helper-tab'} onClick={() => { setHelperTab('plans'); setPlansMenuOpen(v => !v); }}>Plans ▾</button>
+              {plansMenuOpen && <div className="helper-plan-dropdown" aria-label="Choose a financial plan">
+                <div className="helper-plan-count">Your plans ({plans.length}/3)</div>
+                {plans.map(plan => <div className="helper-plan-choice" key={plan.id}>
+                  <button type="button" className={selectedPlanId === plan.id ? 'helper-plan-select selected' : 'helper-plan-select'} onClick={() => { setSelectedPlanId(plan.id); setHelperTab('plans'); setPlansMenuOpen(false); }}>{plan.name}</button>
+                  <button type="button" className="helper-plan-delete" aria-label={`Delete ${plan.name}`} title={`Delete ${plan.name}`} onClick={() => deletePlan(plan.id)}>×</button>
+                </div>)}
+                {plans.length === 0 && <p>No plans yet. Ask the chat to create one.</p>}
+                {plans.length === 3 && <p>Maximum 3 plans reached.</p>}
+              </div>}
+            </div>
+          </div>
+          <div id="helper-results" role="tabpanel" aria-labelledby={helperTab === 'questions' ? 'helper-questions-tab' : 'helper-plans-tab'} className="helper-tab-content" key={`${helperTab}-${selectedPlanId ?? 'none'}`}>
+            {helperTab === 'questions' ? (
+              <>{insights.map(item => (
+                <article className="helper-insight" key={item.id}><h2>{item.title}</h2><p>{item.description}</p></article>
+              ))}</>
+            ) : plans.find(p => p.id === selectedPlanId) ? (
+              <>
+                <section className="helper-plan-actions" aria-label="Action plan">
+                  <h2 className="uppercase">{plans.find(p => p.id === selectedPlanId)?.name} — {plans.find(p => p.id === selectedPlanId)?.durationMonths} MONTH ACTION PLAN</h2>
+                  {plans.find(p => p.id === selectedPlanId)?.steps.map((step, index) => <div className="helper-plan-step" key={step.id}>
+                    <span>{index + 1}. {step.title}{step.description && <small className="helper-step-description">{step.description}</small>}</span>
+                    {step.completed && <span className="helper-plan-status">completed</span>}
+                  </div>)}
+                </section>
+                <section className="helper-plan-score" aria-label="Plan Score">
+                  <h2>{plans.find(p => p.id === selectedPlanId)?.summary.label}</h2>
+                  <div className="helper-score-prediction"><span className="helper-trend-arrows" aria-hidden="true">↗ ↗</span><strong>{plans.find(p => p.id === selectedPlanId)?.summary.value}</strong></div>
+                  {plans.find(p => p.id === selectedPlanId)?.summary.note && <p>{plans.find(p => p.id === selectedPlanId)?.summary.note}</p>}
+                </section>
+              </>
+            ) : <div className="helper-empty-plans">No plans yet. Type “create a savings plan” in the chat to try it.</div>}
+          </div>
+        </section>
+      </main>
+      ) : (
+      <main className="helper-canvas">
+        <div className="p-10 text-center">Coming Soon...</div>
+      </main>
+      )}
+      <nav className="footer-nav" aria-label="Main navigation">
+        <button className={page === 'dashboard' ? 'selected' : ''} onClick={() => setPage('dashboard')}>Dashboard</button>
+        <button type="button" className={page === 'helper' ? 'selected' : ''} onClick={() => setPage('helper')}>AI Helper</button>
+        <button type="button" onClick={() => window.alert('Assistant page coming soon')}>Assistant</button>
+      </nav>
+      {showLoanDetails && (
+        <div className="modal-backdrop" onClick={() => setShowLoanDetails(false)}>
+          <section className="modal-dialog" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+            <h2>Loan details</h2>
+            <p>Outstanding balance: ${userData?.loan_balance || '1,967.00'}</p>
+            <p>Upcoming repayment: $100.00 — Oct 17</p>
+            <button onClick={() => setShowLoanDetails(false)}>Close</button>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

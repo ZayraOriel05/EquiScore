@@ -1,4 +1,4 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -6,4 +6,48 @@ body {
   @apply bg-brandLightGreen text-textDark antialiased;
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap");
+
+:root {
+  --ink: #042c2e;
+  --moss: #6f8f7b;
+  --sage: #8fa595;
+  --mist: #c5ccbf;
+  --fog: #e2e4e0;
+  --paper: #f4f4f2;
+  --white: #ffffff;
+  --go: #1fb26b;
+  --danger: #a33b2f;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  color: var(--ink);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--go);
+  outline-offset: 2px;
 }
