@@ -1,4 +1,3 @@
-
 AI-Powered Credit Scoring Model
 Focus into microfinance
 Target the demographic with people who have low credit scores 
