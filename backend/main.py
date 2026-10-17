@@ -6,6 +6,15 @@ from typing import List
 
 app = FastAPI(title="EquiScore Backend")
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Create database tables
 models.Base.metadata.create_all(bind=database.engine)
 
@@ -81,4 +90,5 @@ def chat_with_assistant(req: ChatRequest, db: Session = Depends(database.get_db)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8080, reload=True)
+
