@@ -48,7 +48,7 @@ EquiScore/ (Repository Root)
 ## 🛠️ Tech Stack & Implementation Details
 
 *   **Frontend Panel:** `Vite` + `React` + `Tailwind CSS` + `Vercel` (Optimized for fast rendering on mobile browsers in low-bandwidth areas)
-*   **API Layer Microservice:** `Python` + `FastAPI` + `Uvicorn` + `SQLite` (Handles concurrent JSON payloads seamlessly)
+*   **API Layer Microservice:** `Python` + `FastAPI` + `Uvicorn` + `SQLite` (Handles concurrent JSON payloads)
 *   **Machine Learning Frame:** `Scikit-Learn` (`RandomForestClassifier`), `LightGBM`, `XGBoost` (Trained on tabular financial risk distributions)
 *   **Local AI Execution:** `Ollama` + `PyTorch` (Powers the custom prompt boundaries of our offline financial accountability chatbot)
 
@@ -69,7 +69,7 @@ pip install -r requirements.txt
 # Run the Scikit-Learn training step and launch the server
 python backend/app.py
 ```
-*The local underwriting API service will bind to `http://localhost:8000`.*
+*The local underwriting API service will bind to `http://localhost:8080`.*
 
 ### 2. Launch the Client Dashboard
 Open a second terminal window to ignite your interactive user panel:
