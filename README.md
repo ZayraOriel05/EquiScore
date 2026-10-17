@@ -1,4 +1,3 @@
-Inspo: https://www.bettermindlabs.org/post/5-ai-and-finance-projects-high-school-students-can-build-to-enhance-college-applications#viewer-sk1qp474
 
 AI-Powered Credit Scoring Model
 Focus into microfinance
