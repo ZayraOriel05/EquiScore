@@ -3,7 +3,7 @@ import json
 
 class FinancialAssistant:
     def __init__(self, model_name="llama3"):
-        self.ollama_url = "http://localhost:11434/api/generate"
+        self.ollama_url = "http://localhost:11434/api/generate" # don't open in browser
         self.model_name = model_name
 
     def get_advice(self, user_data, user_query):
