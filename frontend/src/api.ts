@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'https://magnetism-easel-slingshot.ngrok-free.dev';
 
 export interface UserData {
     user: string;
