@@ -7,12 +7,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        brandGreen: '#1A4D32',    // Deep Forest Green (Primary)
-        brandMidGreen: '#2D6A4F',  // Medium Green (Accents)
-        brandLightGreen: '#E8F5E9', // Very soft green (Page backgrounds)
-        brandGrey: '#F9FAFB',     // Light grey (Card backgrounds)
-        textDark: '#1F2937',      // Dark charcoal for text
+        brandGreen: '#1A4D32',    // Deep Forest Green
+        brandMidGreen: '#2D6A4F',  // Medium Green
+        brandLightGreen: '#F0F7F4', // Very soft page background
+        brandGrey: '#F9FAFB',     // Card background
+        accentGreen: '#4CAF50',   // Bright green for success/progress
+        textDark: '#1F2937',
       },
+      borderRadius: {
+        '3xl': '1.5rem',
+        '4xl': '2rem',
+      }
     },
   },
   plugins: [],

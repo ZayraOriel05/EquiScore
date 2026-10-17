@@ -8,119 +8,116 @@ import {
   Wallet, 
   Calendar,
   Send,
-  ArrowUpRight
+  ArrowUpRight,
+  ChevronRight,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import { fetchLoanDetails, getCreditScore, chatWithAssistant, UserData } from './api';
 
-// --- Sub-Component: Dashboard View ---
+// --- Components ---
+
+const StatCard = ({ label, value, icon: Icon, color = "text-brandGreen" }: any) => (
+  <div className="bg-white p-6 rounded-3xl shadow-sm border border-brandLightGreen space-y-2">
+    <div className="flex justify-between items-center">
+      <span className="text-gray-500 text-sm font-medium">{label}</span>
+      <Icon size={18} className={color} />
+    </div>
+    <div className="text-2xl font-bold text-textDark">{value}</div>
+  </div>
+);
+
 const DashboardView = ({ data }: { data: UserData | null }) => {
   return (
-    <div className="p-6 space-y-6 animate-in fade-in duration-500">
-      <header className="flex justify-between items-center mb-8">
+    <div className="p-8 space-y-8 animate-in fade-in duration-500">
+      <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-textDark">Welcome Back, {data?.user || 'Borrower'}!</h1>
-          <p className="text-gray-500">Here's your account overview</p>
+          <h1 className="text-4xl font-black text-textDark tracking-tight">Welcome Back, {data?.user || 'Borrower'}!</h1>
+          <p className="text-gray-500 mt-1 text-lg">Here is your current financial overview</p>
         </div>
-        <div className="flex items-center gap-3 bg-white p-2 rounded-full shadow-sm border border-brandLightGreen">
-          <div className="w-10 h-10 bg-brandGreen rounded-full flex items-center justify-center text-white">
-            <User size={20} />
+        <div className="flex items-center gap-4 bg-white p-2 pr-6 rounded-full shadow-sm border border-brandLightGreen">
+          <div className="w-12 h-12 bg-brandGreen rounded-full flex items-center justify-center text-white">
+            <User size={24} />
           </div>
-          <span className="pr-4 font-medium">{data?.user || 'User'}</span>
+          <span className="font-bold text-textDark">{data?.user || 'Demo User'}</span>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Credit Score Card */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-brandLightGreen flex flex-col items-center justify-center text-center space-y-4">
-          <h3 className="text-gray-500 font-medium">Credit Score</h3>
-          <div className="relative w-32 h-32 flex items-center justify-center">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Credit Score Ring */}
+        <div className="bg-white p-8 rounded-4xl shadow-sm border border-brandLightGreen flex flex-col items-center justify-center text-center space-y-6">
+          <h3 className="text-gray-500 font-bold uppercase tracking-widest text-xs">Current Credit Score</h3>
+          <div className="relative w-40 h-40 flex items-center justify-center">
             <svg className="w-full h-full transform -rotate-90">
-              <circle
-                cx="64" cy="64" r="58"
-                stroke="currentColor" strokeWidth="12"
-                fill="transparent" className="text-brandLightGreen"
-              />
-              <circle
-                cx="64" cy="64" r="58"
-                stroke="currentColor" strokeWidth="12"
-                fill="transparent" strokeDasharray={364}
-                strokeDashoffset={364 - (364 * 640) / 850} 
-                strokeLinecap="round" className="text-brandGreen"
-              />
+              <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="16" fill="transparent" className="text-brandLightGreen" />
+              <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="16" fill="transparent" strokeDasharray={440} strokeDashoffset={440 - (440 * 640) / 850} strokeLinecap="round" className="text-brandGreen" />
             </svg>
-            <span className="absolute text-3xl font-bold text-textDark">640</span>
+            <div className="absolute flex flex-col items-center">
+              <span className="text-5xl font-black text-textDark">640</span>
+              <span className="text-xs font-bold text-brandGreen uppercase">Good</span>
+            </div>
           </div>
-          <p className="text-sm text-gray-400">Good standing - Keep it up!</p>
+          <p className="text-sm text-gray-400 max-w-[200px]">Your score is based on alternative financial indicators.</p>
         </div>
 
-        {/* Loan Balance Card */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-brandLightGreen space-y-4">
+        {/* Debt Progress Card */}
+        <div className="bg-white p-8 rounded-4xl shadow-sm border border-brandLightGreen space-y-6">
           <div className="flex justify-between items-start">
-            <h3 className="text-gray-500 font-medium">Loan Balance</h3>
+            <h3 className="text-gray-500 font-bold uppercase tracking-widest text-xs">Loan Repayment</h3>
             <Wallet className="text-brandGreen" size={20} />
           </div>
-          <div className="text-4xl font-bold text-textDark">${data?.loan_balance || '1,967.00'}</div>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Paid: 10%</span>
-              <span className="text-gray-400">${(data?.loan_balance || 1967) * 0.1}</span>
+          <div className="space-y-1">
+            <div className="text-4xl font-black text-textDark">${data?.loan_balance || '1,967.00'}</div>
+            <p className="text-sm text-gray-400">Outstanding Balance</p>
+          </div>
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm font-bold">
+              <span className="text-gray-500">Paid: 10%</span>
+              <span className="text-brandGreen">${(data?.loan_balance || 1967) * 0.1}</span>
             </div>
-            <div className="w-full bg-brandLightGreen h-3 rounded-full overflow-hidden">
-              <div className="bg-brandGreen h-full w-[10%]" />
+            <div className="w-full bg-brandLightGreen h-4 rounded-full overflow-hidden border border-brandGreen/10">
+              <div className="bg-brandGreen h-full w-[10%] transition-all duration-1000" />
             </div>
           </div>
         </div>
 
-        {/* Income/Savings Card */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-brandLightGreen space-y-4">
-          <h3 className="text-gray-500 font-medium mb-4">Financial Health</h3>
-          <div className="flex justify-between items-center p-3 bg-brandLightGreen rounded-2xl">
-            <div className="flex items-center gap-3">
-              <TrendingUp className="text-brandGreen" size={18} />
-              <span className="text-sm font-medium">Monthly Income</span>
-            </div>
-            <span className="font-bold">${data?.income || '10,000'}</span>
-          </div>
-          <div className="flex justify-between items-center p-3 bg-brandLightGreen rounded-2xl">
-            <div className="flex items-center gap-3">
-              <Wallet className="text-brandGreen" size={18} />
-              <span className="text-sm font-medium">Total Savings</span>
-            </div>
-            <span className="font-bold">${data?.savings || '500'}</span>
-          </div>
+        {/* Financial Stats */}
+        <div className="grid grid-cols-1 gap-4">
+          <StatCard label="Monthly Income" value={`$${data?.income || '10,000'}`} icon={TrendingUp} />
+          <StatCard label="Total Savings" value={`$${data?.savings || '500'}`} icon={Wallet} />
         </div>
       </div>
 
-      {/* Upcoming Payments Section */}
-      <div className="bg-white p-6 rounded-3xl shadow-sm border border-brandLightGreen">
+      {/* Payments Table */}
+      <div className="bg-white p-8 rounded-4xl shadow-sm border border-brandLightGreen">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-bold text-textDark flex items-center gap-2">
-            <Calendar className="text-brandGreen" size={22} />
+          <h3 className="text-2xl font-bold text-textDark flex items-center gap-3">
+            <Calendar className="text-brandGreen" size={28} />
             Upcoming Loan Payments
           </h3>
           <button className="text-brandGreen text-sm font-bold flex items-center gap-1 hover:underline">
-            View All <ArrowUpRight size={16} />
+            Manage All <ArrowUpRight size={16} />
           </button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead>
-              <tr className="text-gray-400 text-sm border-b border-brandLightGreen">
-                <th className="pb-3 font-medium">Date</th>
-                <th className="pb-3 font-medium">Amount</th>
-                <th className="pb-3 font-medium">Status</th>
-                <th className="pb-3 font-medium text-right">Action</th>
+            <thead className="bg-brandLightGreen">
+              <tr className="text-gray-500 text-sm">
+                <th className="p-4 font-bold rounded-l-2xl">Date</th>
+                <th className="p-4 font-bold">Amount</th>
+                <th className="p-4 font-bold">Status</th>
+                <th className="p-4 font-bold text-right rounded-r-2xl">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-brandLightGreen">
-              <tr className="text-sm">
-                <td className="py-4 font-medium">Oct 17, 2026</td>
-                <td className="py-4 font-bold">$100.00</td>
-                <td className="py-4">
-                  <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">Pending</span>
+              <tr className="hover:bg-brandLightGreen/50 transition">
+                <td className="p-4 font-medium">Oct 17, 2026</td>
+                <td className="p-4 font-bold text-brandGreen">$100.00</td>
+                <td className="p-4">
+                  <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Pending</span>
                 </td>
-                <td className="py-4 text-right">
-                  <button className="px-4 py-1 bg-brandGreen text-white rounded-lg text-xs font-bold hover:bg-opacity-90 transition">Pay Now</button>
+                <td className="p-4 text-right">
+                  <button className="px-6 py-2 bg-brandGreen text-white rounded-xl text-xs font-bold hover:shadow-lg transition active:scale-95">Pay Now</button>
                 </td>
               </tr>
             </tbody>
@@ -131,129 +128,108 @@ const DashboardView = ({ data }: { data: UserData | null }) => {
   );
 };
 
-// --- Sub-Component: AI Helper View ---
-const HelperView = () => {
-  return (
-    <div className="p-6 space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <h2 className="text-3xl font-bold text-textDark">What Are We Learning Today?</h2>
-          <div className="relative">
-            <input 
-              type="text" 
-              placeholder="Ask me anything..." 
-              className="w-full p-4 pl-5 pr-12 rounded-2xl border border-brandLightGreen focus:ring-2 focus:ring-brandGreen outline-none transition"
-            />
-            <button className="absolute right-3 top-3 p-2 bg-brandGreen text-white rounded-xl">
-              <Send size={18} />
-            </button>
-          </div>
-          <div className="bg-white p-6 rounded-3xl border border-brandLightGreen">
-            <p className="text-gray-500 italic">"How can I improve my credit score using my mobile money history?"</p>
-          </div>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="bg-brandGreen text-white p-6 rounded-3xl shadow-lg space-y-3">
-            <h4 className="font-bold flex items-center gap-2">
-              <TrendingUp size={18} /> Debt Repayment
-            </h4>
-            <p className="text-sm opacity-90">You have been consistently meeting your deadlines. See how you can adjust your goals to meet your target.</p>
-          </div>
-          <div className="bg-white p-6 rounded-3xl border border-brandLightGreen shadow-sm space-y-3">
-            <h4 className="font-bold text-brandGreen flex items-center gap-2">
-              <Wallet size={18} /> Savings Balance
-            </h4>
-            <p className="text-sm text-gray-500">You are not on track to meet your saving goal. See how you can adjust your spending.</p>
-          </div>
-          <div className="bg-white p-6 rounded-3xl border border-brandLightGreen shadow-sm space-y-3">
-            <h4 className="font-bold text-brandGreen flex items-center gap-2">
-              <TrendingUp size={18} /> Financial Advice
-            </h4>
-            <p className="text-sm text-gray-500">You seem to be generating more income. See how this could potentially help your credit score increase.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// --- Sub-Component: Assistant View ---
 const AssistantView = ({ userId }: { userId: number }) => {
   const [messages, setMessages] = useState([
-    { role: 'ai', text: 'Hello! I am your EquiScore Assistant. How can I help you manage your finances today?' }
+    { role: 'ai', text: 'Welcome to your AI Financial Coach. I have analyzed your dashboard. How can I help you grow your business today?' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSend = async (text: string) => {
+    const msg = text || input;
+    if (!msg.trim()) return;
     
-    const userMsg = { role: 'user', text: input };
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
+    setMessages(prev => [...prev, { role: 'user', text: msg }]);
+    if (text) setInput('');
     setLoading(true);
 
     try {
-      const response = await chatWithAssistant(userId, input);
+      const response = await chatWithAssistant(userId, msg);
       setMessages(prev => [...prev, { role: 'ai', text: response.response }]);
     } catch (e) {
-      setMessages(prev => [...prev, { role: 'ai', text: 'Sorry, I had a glitch. Try again!' }]);
+      setMessages(prev => [...prev, { role: 'ai', text: 'I am having trouble connecting to my brain. Please check the server!' }]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 h-[calc(100vh-12rem)] flex gap-6 animate-in fade-in duration-500">
-      <div className="flex-1 bg-white rounded-3xl border border-brandLightGreen shadow-sm flex flex-col overflow-hidden">
-        <div className="p-4 border-b border-brandLightGreen bg-brandGrey flex items-center gap-3">
-          <Bot className="text-brandGreen" />
-          <span className="font-bold">AI Financial Coach</span>
+    <div className="p-8 h-full flex gap-8 animate-in slide-in-from-bottom-4 duration-500">
+      {/* Chat Window */}
+      <div className="flex-1 bg-white rounded-4xl border border-brandLightGreen shadow-sm flex flex-col overflow-hidden">
+        <div className="p-6 border-b border-brandLightGreen bg-brandGrey flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-brandGreen rounded-full flex items-center justify-center text-white">
+              <Bot size={20} />
+            </div>
+            <span className="font-black text-lg text-textDark">AI Financial Coach</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-bold text-brandGreen bg-brandLightGreen px-3 py-1 rounded-full">
+            <span className="w-2 h-2 bg-brandGreen rounded-full animate-pulse" />
+            Live Analysis Active
+          </div>
         </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] p-3 rounded-2xl ${m.role === 'user' ? 'bg-brandGreen text-white rounded-tr-none' : 'bg-brandLightGreen text-textDark rounded-tl-none'}`}>
-                {m.text}
+              <div className={`max-w-[70%] p-4 rounded-3xl ${m.role === 'user' ? 'bg-brandGreen text-white rounded-tr-none shadow-md' : 'bg-brandLightGreen text-textDark rounded-tl-none border border-brandGreen/10'}`}>
+                <p className="text-sm leading-relaxed">{m.text}</p>
               </div>
             </div>
           ))}
-          {loading && <div className="text-xs text-gray-400 italic">Coach is thinking...</div>}
+          {loading && <div className="text-xs text-gray-400 italic ml-2">Coach is analyzing your data...</div>}
         </div>
-        <div className="p-4 border-t border-brandLightGreen flex gap-2">
+        
+        <div className="p-6 border-t border-brandLightGreen flex gap-4 bg-white">
           <input 
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+            onKeyPress={(e) => e.key === 'Enter' && handleSend(input)}
             type="text" 
-            placeholder="Ask about your budget..." 
-            className="flex-1 p-3 rounded-xl border border-brandLightGreen outline-none focus:ring-2 focus:ring-brandGreen"
+            placeholder="Ask about your debt, savings or a business plan..." 
+            className="flex-1 p-4 rounded-2xl border border-brandLightGreen outline-none focus:ring-2 focus:ring-brandGreen transition bg-brandGrey"
           />
-          <button onClick={handleSend} className="p-3 bg-brandGreen text-white rounded-xl hover:bg-opacity-90 transition">
-            <Send size={20} />
+          <button onClick={() => handleSend(input)} className="p-4 bg-brandGreen text-white rounded-2xl hover:shadow-lg transition active:scale-95">
+            <Send size={24} />
           </button>
         </div>
       </div>
       
-      <div className="w-80 space-y-4">
-        <div className="bg-white p-6 rounded-3xl border border-brandLightGreen shadow-sm space-y-4">
-          <h3 className="font-bold text-lg text-brandGreen">Your Action Plan</h3>
+      {/* Quick Questions Panel */}
+      <div className="w-96 space-y-6">
+        <div className="bg-white p-8 rounded-4xl border border-brandLightGreen shadow-sm space-y-6">
+          <h3 className="font-black text-xl text-textDark flex items-center gap-2">
+            <MessageSquare className="text-brandGreen" size={24} />
+            Quick Questions
+          </h3>
           <div className="space-y-3">
             {[
-              'Make all payments on time',
-              'Keep credit utilization below 30%',
-              'Avoid opening new credit accounts'
+              { q: "Recommend a plan to get rid of my debt", icon: <TrendingUp size={16}/> },
+              { q: "How can I increase my credit score?", icon: <TrendingUp size={16}/> },
+              { q: "Create a budgeting plan for my business", icon: <Wallet size={16}/> },
+              { q: "What are the best savings goals for me?", icon: <CheckCircle2 size={16}/> },
             ].map((item, i) => (
-              <div key={i} className="flex items-start gap-3 p-2 rounded-lg hover:bg-brandLightGreen transition cursor-pointer">
-                <div className="w-6 h-6 rounded-full bg-brandGreen text-white text-xs flex items-center justify-center flex-shrink-0 font-bold">{i+1}</div>
-                <span className="text-sm text-gray-600">{item}</span>
-              </div>
+              <button 
+                key={i} 
+                onClick={() => handleSend(item.q)}
+                className="w-full text-left p-4 rounded-2xl bg-brandGrey border border-transparent hover:border-brandGreen hover:bg-brandLightGreen transition-all group flex items-center gap-3"
+              >
+                <div className="p-2 bg-white rounded-lg text-brandGreen group-hover:bg-brandGreen group-hover:text-white transition">
+                  {item.icon}
+                </div>
+                <span className="text-sm font-medium text-gray-600 group-hover:text-textDark">{item.q}</span>
+              </button>
             ))}
           </div>
-          <div className="mt-6 p-4 bg-brandLightGreen rounded-2xl border border-brandGreen/20 text-center">
-            <p className="text-xs text-gray-500 uppercase font-bold">Potential Score Increase</p>
-            <p className="text-2xl font-black text-brandGreen">+40 to 60 points</p>
+          <div className="mt-8 p-6 bg-brandGreen text-white rounded-3xl relative overflow-hidden">
+            <div className="relative z-10">
+              <p className="text-xs font-bold uppercase opacity-70 mb-1">AI Insight</p>
+              <p className="text-lg font-bold leading-tight">Your ability to save $500 suggests a high potential for credit growth!</p>
+            </div>
+            <div className="absolute -right-4 -bottom-4 opacity-20 rotate-12">
+              <Bot size={80} />
+            </div>
           </div>
         </div>
       </div>
@@ -261,51 +237,52 @@ const AssistantView = ({ userId }: { userId: number }) => {
   );
 };
 
-// --- Main App Component ---
 export default function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'helper' | 'assistant'>('dashboard');
   const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
-    fetchLoanDetails(1) // Assuming User ID 1 for demo
+    fetchLoanDetails(1)
       .then(setUserData)
       .catch(err => console.error('Error loading data:', err));
   }, []);
 
   return (
-    <div className="min-h-screen bg-brandLightGreen flex">
+    <div className="min-h-screen bg-brandLightGreen flex font-sans">
       {/* Sidebar Navigation */}
-      <nav className="w-24 bg-white border-r border-brandLightGreen flex flex-col items-center py-8 space-y-8 shadow-sm">
-        <div className="w-12 h-12 bg-brandGreen rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg">
-          <span className="font-black text-xl">E</span>
+      <nav className="w-24 bg-white border-r border-brandLightGreen flex flex-col items-center py-10 space-y-10 shadow-sm">
+        <div className="w-14 h-14 bg-brandGreen rounded-2xl flex items-center justify-center text-white mb-6 shadow-xl rotate-3">
+          <span className="font-black text-2xl">ES</span>
         </div>
         
         <button 
           onClick={() => setActiveTab('dashboard')}
-          className={`p-3 rounded-2xl transition-all ${activeTab === 'dashboard' ? 'bg-brandGreen text-white shadow-md scale-110' : 'text-gray-400 hover:bg-brandLightGreen'}`}
+          className={`p-4 rounded-2xl transition-all ${activeTab === 'dashboard' ? 'bg-brandGreen text-white shadow-lg scale-110' : 'text-gray-400 hover:bg-brandLightGreen'}`}
+          title="Dashboard"
         >
-          <LayoutDashboard size={24} />
+          <LayoutDashboard size={28} />
         </button>
         
         <button 
           onClick={() => setActiveTab('helper')}
-          className={`p-3 rounded-2xl transition-all ${activeTab === 'helper' ? 'bg-brandGreen text-white shadow-md scale-110' : 'text-gray-400 hover:bg-brandLightGreen'}`}
+          className={`p-4 rounded-2xl transition-all ${activeTab === 'helper' ? 'bg-brandGreen text-white shadow-lg scale-110' : 'text-gray-400 hover:bg-brandLightGreen'}`}
+          title="AI Helper"
         >
-          <MessageSquare size={24} />
+          <MessageSquare size={28} />
         </button>
         
         <button 
           onClick={() => setActiveTab('assistant')}
-          className={`p-3 rounded-2xl transition-all ${activeTab === 'assistant' ? 'bg-brandGreen text-white shadow-md scale-110' : 'text-gray-400 hover:bg-brandLightGreen'}`}
+          className={`p-4 rounded-2xl transition-all ${activeTab === 'assistant' ? 'bg-brandGreen text-white shadow-lg scale-110' : 'text-gray-400 hover:bg-brandLightGreen'}`}
+          title="Assistant"
         >
-          <Bot size={24} />
+          <Bot size={28} />
         </button>
       </nav>
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-hidden">
         {activeTab === 'dashboard' && <DashboardView data={userData} />}
-        {activeTab === 'helper' && <HelperView />}
+        {activeTab === 'helper' && <div className="p-8 text-center text-gray-500 mt-20 font-bold">AI Helper content is integrated into the Assistant View for a better experience. Please click the Bot icon!</div>}
         {activeTab === 'assistant' && <AssistantView userId={1} />}
       </main>
     </div>
