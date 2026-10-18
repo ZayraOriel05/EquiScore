@@ -1,4 +1,4 @@
-# 🚀 EquiScore — AI-Powered Credit Scoring & Microfinance Repayment Ecosystem
+# EquiScore — An AI-Powered Credit Scoring & Microfinance Ecosystem
 
 > **Track Focus:** Sustainable FinTech & Economic Inclusion (Built for Hack the Valley XI)
 > **Live Site:** [amazing-project-drab.vercel.app](https://vercel.app)
