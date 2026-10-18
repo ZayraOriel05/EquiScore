@@ -1,396 +1,532 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
+
+/* ============ theme ============ */
+:root {
+  --ink: #042c2e;
+  --ink-soft: #16484a;
+  --moss: #6f8f7b;
+  --sage: #8fa595;
+  --sage-btn: #95afa4;
+  --mist: #c5ccbf;
+  --fog: #e2e4e0;
+  --paper: #f4f4f2;
+  --white: #ffffff;
+  --go: #2f9e63;
+  --danger: #a33b2f;
+  font-family:
+    "Space Grotesk",
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  color: var(--ink);
+}
+
+/*
+  Everything is sized in rem, and the root size follows the window, so each page scales
+  to fit on one screen without scrolling. 90 and 54 are the design's width and height in rem.
+  Below 12px the page scrolls instead of shrinking further.
+*/
+html {
+  font-size: clamp(12px, min(calc(100vw / 90), calc(100dvh / 54)), 22px);
+}
+
 * {
   box-sizing: border-box;
 }
-:root {
-  font-family: Arial, Helvetica, sans-serif;
-  color: #002b2e;
-  background: #f7f7f7;
-}
 body {
   margin: 0;
-  min-width: 320px;
-}
-button {
-  font: inherit;
-  cursor: pointer;
+  background: var(--paper);
 }
 #root {
-  min-height: 100vh;
+  min-height: 100dvh;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+button,
+input,
+textarea {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+:focus-visible {
+  outline: 3px solid var(--go);
+  outline-offset: 2px;
 }
 
-.dashboard-frame {
-  max-width: 1440px;
-  width: 100%;
-  margin: 0 auto;
-  min-height: 1032px;
-  background: #f7f7f7;
-  border: 1px solid #5b5b5b;
-  position: relative;
-  overflow: hidden;
+/* ============ app shell: header / page / nav ============ */
+.app {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
 }
-.dashboard-canvas {
-  height: 925px;
-  position: relative;
+.app > main {
+  min-height: 0;
 }
-.dashboard-status {
-  height: 925px;
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 1.6rem;
+  min-height: 4rem;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.brand-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  border-radius: 2rem;
+}
+.brand-logo {
+  width: 2.9rem;
+  height: 2.9rem;
+  display: block;
+}
+.brand-name {
+  font-size: 1.55rem;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  color: var(--moss);
+}
+.brand-name b {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.profile-button {
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 50%;
+  border: 0;
+  background: var(--ink);
   display: grid;
   place-items: center;
-  font-size: 22px;
-  padding: 24px;
+}
+.profile-button:hover {
+  background: var(--ink-soft);
+}
+.profile-button[aria-current="page"] {
+  box-shadow: 0 0 0 0.2rem var(--sage-btn);
+}
+.profile-button svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: #e4ebe4;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.footer-nav {
+  background: var(--moss);
+  padding: 0.9rem 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+.footer-nav button {
+  width: 15rem;
+  height: 2.8rem;
+  border-radius: 2rem;
+  background: var(--sage-btn);
+  border: 0.15rem solid var(--ink);
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+.footer-nav button:hover {
+  background: #b8cbc0;
+}
+.footer-nav button.selected {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.dashboard-status {
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+  padding: 2rem;
   text-align: center;
 }
 .dashboard-status-error {
-  color: #a33b2f;
+  color: var(--danger);
 }
 
-/* ---------- left column ---------- */
-.welcome-heading {
-  position: absolute;
-  left: 39px;
-  top: 111px;
-}
-.welcome-heading h1 {
-  font-size: 42px;
-  font-weight: 400;
-  margin: 0;
-  letter-spacing: 0.1px;
-}
-.welcome-heading p {
-  font-size: 20px;
-  margin: 0;
-}
-.vertical-divider {
-  position: absolute;
-  left: 550px;
-  top: 80px;
-  height: 785px;
-  border-left: 1px solid #888;
+/* ============ dashboard ============ */
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(22rem, 27rem) 1fr;
+  width: 100%;
+  max-width: 100rem;
+  margin: 0 auto;
 }
 
-.loan-card {
-  position: absolute;
-  width: 462px;
-  height: 340px;
-  left: 33px;
-  top: 274px;
-  background: rgba(183, 191, 179, 0.8);
-  border-radius: 30px;
-  padding: 13px 11px;
-}
-.loan-card-meta {
-  height: 52px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 13px 16px;
-  font-size: 13px;
-  color: #1c1c1c;
-}
-.loan-balance {
-  border-radius: 29px;
-  height: 203px;
-  background: #002b2e;
-  color: #fff;
+.dash-left {
+  padding: 0.4rem 2rem 1.5rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 24px 27px;
+  gap: 1.3rem;
+  border-right: 1px solid var(--ink);
+  min-height: 0;
 }
-.balance-amount {
-  font-size: 51px;
-  font-weight: 300;
-  line-height: 1.1;
-  white-space: nowrap;
-}
-.currency {
-  font-size: 26px;
-  margin-right: 2px;
-}
-.cents {
-  font-size: 28px;
-  color: #c8d2d2;
-}
-.balance-label {
-  font-size: 13px;
-  margin-top: 8px;
-}
-.loan-details {
-  background: transparent;
-  border: 0;
-  color: white;
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  text-align: left;
-  padding: 17px 21px 5px;
-  font-size: 17px;
-}
-.loan-details span {
-  font-size: 30px;
-  line-height: 18px;
+.dash-right {
+  padding: 0.4rem 2rem 1.5rem;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 1.3rem;
+  min-height: 0;
 }
 
+.welcome-heading h1 {
+  font-size: 2.8rem;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+.welcome-heading p {
+  font-size: 1.25rem;
+  margin-top: 0.2rem;
+}
+
+/* loan card */
+.loan-card {
+  flex: 1 1 0;
+  min-height: 13rem;
+  max-height: 22rem;
+  background: var(--mist);
+  border-radius: 1.7rem;
+  padding: 0.8rem 0.8rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  color: var(--white);
+}
+.loan-panel {
+  flex: 1;
+  min-height: 0;
+  background: var(--white);
+  border-radius: 1.3rem;
+  padding: 0.55rem;
+  display: flex;
+  flex-direction: column;
+}
+.loan-card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #1c1c1c;
+  padding: 0.2rem 0.6rem 0.5rem;
+}
+.loan-balance {
+  flex: 1;
+  background: var(--ink);
+  border-radius: 1.2rem;
+  padding: 1rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.3rem;
+}
+.balance-amount {
+  font-size: 3.7rem;
+  font-weight: 300;
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: -0.02em;
+}
+.currency {
+  font-size: 1.9rem;
+  margin-right: 0.15rem;
+  opacity: 0.75;
+}
+.cents {
+  font-size: 2rem;
+  opacity: 0.65;
+}
+.balance-label {
+  font-size: 0.85rem;
+}
+.loan-details {
+  background: none;
+  border: 0;
+  color: var(--white);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  padding: 0.8rem 0.9rem 0.3rem;
+  font-size: 1.05rem;
+}
+.loan-details span {
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+/* progress card */
 .repaid-card {
-  position: absolute;
-  width: 461px;
-  height: 200px;
-  left: 34px;
-  top: 647px;
-  background: #fff;
-  border-radius: 30px;
-  padding: 35px 24px;
+  flex: 0 0 auto;
+  background: var(--white);
+  border-radius: 1.7rem;
+  padding: 1.3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   color: #000;
 }
 .repaid-title {
   display: flex;
   align-items: baseline;
-  gap: 7px;
+  gap: 0.45rem;
   white-space: nowrap;
-  font-size: 18px;
+  font-size: 1.1rem;
 }
 .repaid-title strong {
-  font-size: 36px;
+  font-size: 2.2rem;
   font-weight: 400;
 }
 .repaid-values {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
-  margin: 22px 0 9px;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
 }
 .repaid-track {
-  width: 100%;
-  height: 19px;
+  height: 1.1rem;
   background: #d9d9d9;
-  border-radius: 50px;
-  padding: 4px;
+  border-radius: 2rem;
+  padding: 0.22rem;
 }
 .repaid-fill {
   width: var(--fill, 0%);
   height: 100%;
-  border-radius: 50px;
+  border-radius: 2rem;
   background: #315b56;
 }
 .repaid-empty {
-  margin: 0;
-  font-size: 16px;
-  line-height: 1.4;
+  font-size: 1rem;
+  line-height: 1.45;
 }
 
-/* ---------- credit score ---------- */
+/* credit score */
 .score-card {
-  position: absolute;
-  left: 590px;
-  top: 30px;
-  width: 789px;
-  height: 246px;
-  background: rgba(183, 191, 179, 0.29);
-  border: 1px solid #646a66;
-  border-radius: 25px;
+  background: var(--fog);
+  border: 1px solid rgba(4, 44, 46, 0.55);
+  border-radius: 1.7rem;
+  padding: 1rem 1.8rem;
+  display: grid;
+  grid-template-columns: minmax(12rem, 16rem) 1fr;
+  gap: 2rem;
+  align-items: center;
 }
-.score-arc {
-  position: absolute;
-  width: 350px;
-  height: 205px;
-  left: 46px;
-  top: 19px;
-}
-.score-text {
-  position: absolute;
-  left: 46px;
-  top: 95px;
-  width: 350px;
+.gauge {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.gauge svg {
+  width: 100%;
+  display: block;
+  overflow: visible;
+}
+.gauge-track,
+.gauge-fill {
+  fill: none;
+  stroke-width: 16;
+  stroke-linecap: round;
+}
+.gauge-track {
+  stroke: #d1d3d0;
+}
+.gauge-fill {
+  stroke: var(--band, var(--sage));
+  stroke-dasharray: 100;
+  stroke-dashoffset: var(--gauge-offset, 100);
+}
+.gauge-text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 28%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.05;
   color: #000;
 }
 .score-value {
-  font-size: 61px;
+  font-size: 3.2rem;
   font-weight: 400;
-  line-height: 1;
 }
 .score-label {
-  font-size: 26px;
-  margin-top: -3px;
+  font-size: 1.15rem;
 }
 .score-arrow {
-  color: #38bc68;
-  font-size: 42px;
-  line-height: 0.9;
-  margin-top: 9px;
+  color: var(--band, var(--go));
+  font-size: 2rem;
+  line-height: 0.8;
+  margin-top: 0.3rem;
 }
 
-/* ---------- upcoming payments ---------- */
+.score-note {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 30rem;
+}
+.score-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+.score-verdict::before {
+  content: "";
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 50%;
+  background: var(--band, var(--sage));
+}
+.score-note p {
+  font-size: 1.02rem;
+  line-height: 1.45;
+}
+
+/* upcoming payments */
 .repayment-due {
-  position: absolute;
-  left: 590px;
-  top: 321px;
-  width: 789px;
-  height: 355px;
-  background: #fff;
-  border: 3px solid #002b2e;
-  border-radius: 25px;
+  background: var(--white);
+  border: 0.15rem solid var(--ink);
+  border-radius: 1.7rem;
+  padding: 0.9rem 1.4rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 .repayment-heading {
-  position: absolute;
-  top: 7px;
-  left: 19px;
-  margin: 0;
-  padding: 12px 26px;
-  color: #000;
+  align-self: flex-start;
+  font-size: 0.95rem;
   font-weight: 400;
-  font-size: 21px;
-  line-height: 1.1;
-  border: 2px solid #191919;
-  border-radius: 35px;
+  letter-spacing: 0.02em;
+  color: #000;
+  border: 0.12rem solid #191919;
+  border-radius: 2rem;
+  padding: 0.5rem 1.2rem;
 }
 .repayment-content {
-  position: absolute;
-  top: 87px;
-  left: 28px;
-  right: 15px;
-  height: 170px;
+  margin-block: auto;
   display: flex;
-  gap: 17px;
+  gap: 1.2rem;
+  height: 9rem;
 }
 .payments-empty {
-  margin: 0;
   align-self: center;
-  font-size: 22px;
+  font-size: 1.4rem;
 }
 
 .date-badge {
   position: relative;
-  flex: 0 0 158px;
-  height: 170px;
-  background: #e8ecdf;
-  border: 1px solid #777e70;
-  border-radius: 28px;
-  padding: 12px;
+  flex: 0 0 9.5rem;
+  background: #e6e9d6;
+  border: 1px solid #b5bca8;
+  border-radius: 1.6rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 38px;
+  font-size: 2.3rem;
   line-height: 1.1;
   color: #000;
 }
 .date-badge::before {
   content: "";
   position: absolute;
-  inset: 12px;
-  border-radius: 21px;
-  background: #fff;
-  z-index: 0;
+  inset: 0.75rem;
+  border-radius: 1.2rem;
+  background: var(--white);
 }
 .date-badge span {
   position: relative;
-  z-index: 1;
 }
 
 .due-balance {
   flex: 1;
-  height: 148px;
-  align-self: center;
-  background: #002b2e;
-  border-radius: 38px;
-  color: #fff;
-  font-size: 48px;
+  background: var(--ink);
+  color: var(--white);
+  border-radius: 2.4rem;
   display: flex;
   align-items: center;
-  padding: 0 39px;
+  padding: 0 2.4rem;
+  font-size: 3.1rem;
   white-space: nowrap;
 }
 .due-balance span {
   text-decoration: underline;
-  text-underline-offset: 5px;
+  text-underline-offset: 0.35rem;
+  text-decoration-thickness: 0.08rem;
 }
 .due-balance .due-empty {
-  font-size: 30px;
+  font-size: 1.8rem;
   text-decoration: none;
 }
 
-/* ---------- savings and income ---------- */
+/* savings and income */
+.stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.3rem;
+}
 .mini-stat {
-  position: absolute;
-  width: 387px;
-  height: 149px;
-  top: 719px;
-  background: rgba(183, 191, 179, 0.29);
-  border-radius: 30px;
-  padding: 10px 20px;
-  color: #000;
-  font-size: 24px;
+  background: var(--fog);
+  border-radius: 1.6rem;
+  padding: 0.65rem;
 }
-.savings {
-  left: 584px;
-}
-.income {
-  left: 992px;
-}
-.mini-stat .stat-heading {
-  background: white;
+.stat-heading {
   display: block;
-  height: 36px;
-  border-radius: 28px 28px 0 0;
-  font-size: 23px;
-  line-height: 36px;
+  background: var(--white);
+  border-radius: 1.1rem 1.1rem 0 0;
   text-align: center;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  padding: 0.5rem 0 0.8rem;
+  color: #000;
 }
-.mini-stat .stat-amount {
-  background: #002b2e;
-  color: #fff;
+.stat-amount {
+  margin-top: -0.55rem;
+  background: var(--ink);
+  color: var(--white);
+  border-radius: 1.3rem;
   display: flex;
   justify-content: center;
-  align-items: center;
-  border-radius: 26px;
-  height: 91px;
-  white-space: nowrap;
-  font-size: 43px;
+  align-items: baseline;
+  padding: 0.95rem 1rem 1rem;
+  font-size: 2.5rem;
   font-weight: 400;
   line-height: 1;
+  white-space: nowrap;
 }
 .stat-currency {
-  font-size: 27px;
-  margin-right: 1px;
-  color: #b5c4c5;
+  font-size: 1.6rem;
+  margin-right: 0.1rem;
+  opacity: 0.7;
 }
 .stat-cents {
-  font-size: 28px;
-  color: #b5c4c5;
+  font-size: 1.6rem;
+  opacity: 0.7;
 }
 
-/* ---------- footer nav ---------- */
-.footer-nav {
-  height: 107px;
-  width: 100%;
-  background: #6e8979;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-}
-.footer-nav button {
-  width: 280px;
-  height: 50px;
-  border-radius: 28px;
-  background: #95afa4;
-  border: 3px solid #002b2e;
-  color: #002b2e;
-  font-size: 19px;
-}
-.footer-nav button:hover {
-  background: #b8cbc0;
-}
-.footer-nav button.selected {
-  background: #002b2e;
-  color: #fff;
-}
-
-/* ---------- loan details modal ---------- */
+/* loan details popup */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -398,42 +534,39 @@ button {
   display: grid;
   place-items: center;
   z-index: 20;
-  padding: 20px;
+  padding: 1.2rem;
 }
 .modal-dialog {
-  max-width: 420px;
+  max-width: 26rem;
   width: 100%;
-  background: white;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+  background: var(--white);
+  padding: 1.8rem;
+  border-radius: 1.2rem;
+  box-shadow: 0 0.8rem 2.2rem rgba(0, 0, 0, 0.2);
+}
+.modal-dialog h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.6rem;
+  font-weight: 500;
+}
+.modal-dialog p {
+  margin-bottom: 0.4rem;
+  font-size: 1.05rem;
 }
 .modal-dialog button {
-  padding: 10px 20px;
-  background: #002b2e;
-  color: white;
+  margin-top: 0.8rem;
+  padding: 0.6rem 1.3rem;
+  background: var(--ink);
+  color: var(--white);
   border: 0;
-  border-radius: 10px;
+  border-radius: 0.7rem;
 }
 
-/* The pages keep the Figma board proportions on narrower screens. */
-@media (max-width: 1439px) {
-  .dashboard-frame {
-    overflow-x: auto;
-  }
-  .dashboard-canvas {
-    min-width: 1410px;
-  }
-  .footer-nav {
-    min-width: 1410px;
-  }
-}
-
-/* ---------- dashboard entrance motion ---------- */
+/* ============ entrance motion ============ */
 @keyframes dashboardEnter {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(0.75rem);
   }
   to {
     opacity: 1;
@@ -456,56 +589,92 @@ button {
     width: var(--fill, 0%);
   }
 }
-.dashboard-canvas .welcome-heading,
-.dashboard-canvas .loan-card,
-.dashboard-canvas .repaid-card,
-.dashboard-canvas .score-card,
-.dashboard-canvas .repayment-due,
-.dashboard-canvas .mini-stat {
+
+.dashboard .welcome-heading,
+.dashboard .loan-card,
+.dashboard .repaid-card,
+.dashboard .score-card,
+.dashboard .repayment-due,
+.dashboard .mini-stat {
   animation: dashboardEnter 650ms ease-out both;
 }
-.dashboard-canvas .welcome-heading {
+.dashboard .welcome-heading {
   animation-delay: 0ms;
 }
-.dashboard-canvas .loan-card {
+.dashboard .loan-card {
   animation-delay: 120ms;
 }
-.dashboard-canvas .repaid-card {
+.dashboard .repaid-card {
   animation-delay: 220ms;
 }
-.dashboard-canvas .score-card {
+.dashboard .score-card {
   animation-delay: 160ms;
 }
-.dashboard-canvas .repayment-due {
+.dashboard .repayment-due {
   animation-delay: 310ms;
 }
-.dashboard-canvas .mini-stat.savings {
+.dashboard .mini-stat:nth-child(1) {
   animation-delay: 390ms;
 }
-.dashboard-canvas .mini-stat.income {
+.dashboard .mini-stat:nth-child(2) {
   animation-delay: 470ms;
 }
-.dashboard-canvas .score-arc path:last-child {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: gaugeDraw 1550ms cubic-bezier(0.22, 1, 0.36, 1) 360ms forwards;
+.dashboard .gauge-fill {
+  animation: gaugeDraw 1550ms cubic-bezier(0.22, 1, 0.36, 1) 360ms both;
 }
-.dashboard-canvas .repaid-fill {
+.dashboard .repaid-fill {
   animation: paymentFill 1450ms ease-out 350ms both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dashboard-canvas .welcome-heading,
-  .dashboard-canvas .loan-card,
-  .dashboard-canvas .repaid-card,
-  .dashboard-canvas .score-card,
-  .dashboard-canvas .repayment-due,
-  .dashboard-canvas .mini-stat,
-  .dashboard-canvas .score-arc path:last-child,
-  .dashboard-canvas .repaid-fill {
+  .dashboard .welcome-heading,
+  .dashboard .loan-card,
+  .dashboard .repaid-card,
+  .dashboard .score-card,
+  .dashboard .repayment-due,
+  .dashboard .mini-stat,
+  .dashboard .gauge-fill,
+  .dashboard .repaid-fill {
     animation: none !important;
   }
-  .dashboard-canvas .score-arc path:last-child {
-    stroke-dashoffset: var(--gauge-offset, 0);
+}
+
+/* ============ narrow screens: stack the columns and let the page scroll ============ */
+@media (max-width: 860px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+  .dash-left {
+    border-right: 0;
+    border-bottom: 1px solid var(--ink);
+  }
+  .loan-card {
+    flex: 0 0 auto;
+  }
+  .score-card {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+  .score-note {
+    align-items: center;
+  }
+  .repayment-content {
+    height: auto;
+    flex-direction: column;
+  }
+  .due-balance {
+    padding: 1.2rem 2rem;
+  }
+  .stat-row {
+    grid-template-columns: 1fr;
+  }
+  .footer-nav {
+    gap: 0.8rem;
+    padding: 0.8rem;
+  }
+  .footer-nav button {
+    width: auto;
+    flex: 1;
   }
 }

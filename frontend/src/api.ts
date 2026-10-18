@@ -14,6 +14,30 @@ export interface UserData {
   next_payment_amount?: number;
 }
 
+// What the profile page sends. Dates are YYYY-MM-DD strings.
+export interface ProfileData {
+  name: string;
+  income: number;
+  savings: number;
+  loan_balance: number;
+  next_payment_date: string;
+  credit_score: number;
+  loan_total: number;
+  next_payment_amount: number;
+}
+
+// What the backend returns when editing; older accounts may have gaps.
+export interface ProfileRecord {
+  name: string;
+  income: number;
+  savings: number;
+  loan_balance: number;
+  next_payment_date: string | null;
+  credit_score: number | null;
+  loan_total: number | null;
+  next_payment_amount: number | null;
+}
+
 export type PlanCategory = "savings" | "repayment" | "credit" | "other";
 
 export interface Insight {
@@ -60,15 +84,39 @@ export function errorText(err: unknown): string {
   return err instanceof Error ? err.message : "Something went wrong.";
 }
 
-// The backend sends { detail: "..." } for errors such as "Ollama isn't running".
-async function failure(response: Response, fallback: string): Promise<Error> {
+// An error that remembers the HTTP status, so callers can react to a 404.
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
+// The backend sends { detail: "..." } for errors such as "Ollama isn't running",
+// or a list of field problems when the profile form fails validation.
+async function failure(
+  response: Response,
+  fallback: string,
+): Promise<ApiError> {
   try {
     const body = await response.json();
-    if (typeof body?.detail === "string") return new Error(body.detail);
+    if (typeof body?.detail === "string")
+      return new ApiError(body.detail, response.status);
+    if (Array.isArray(body?.detail)) {
+      const messages = body.detail.map(
+        (d: { loc?: string[]; msg?: string }) => {
+          const field = d.loc?.slice(1).join(" ");
+          const msg = (d.msg ?? "").replace(/^Value error, /, "");
+          return field ? `${field}: ${msg}` : msg;
+        },
+      );
+      return new ApiError(messages.join(". "), response.status);
+    }
   } catch {
     /* response wasn't JSON */
   }
-  return new Error(fallback);
+  return new ApiError(fallback, response.status);
 }
 
 /* ---------- dashboard ---------- */
@@ -93,6 +141,40 @@ export async function getCreditScore(data: {
   });
   if (!response.ok) throw new Error("Failed to calculate score");
   return response.json();
+}
+
+/* ---------- profile ---------- */
+
+export async function createProfile(data: ProfileData): Promise<number> {
+  const response = await fetch(`${API_BASE_URL}/profile`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok)
+    throw await failure(response, "Could not create your profile");
+  const body = await response.json();
+  return body.user_id;
+}
+
+export async function fetchProfile(userId: number): Promise<ProfileRecord> {
+  const response = await fetch(`${API_BASE_URL}/profile/${userId}`);
+  if (!response.ok)
+    throw await failure(response, "Could not load your profile");
+  return response.json();
+}
+
+export async function updateProfile(
+  userId: number,
+  data: ProfileData,
+): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/profile/${userId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok)
+    throw await failure(response, "Could not save your profile");
 }
 
 /* ---------- assistant ---------- */

@@ -9,7 +9,7 @@ import requests
 from pydantic import BaseModel, Field, ValidationError
  
 OLLAMA_CHAT_URL = "http://localhost:11434/api/chat"
-MODEL_NAME = "llama3"
+MODEL_NAME = "llama3.2"
 TIMEOUT_SECONDS = 120
  
 PlanCategory = Literal["savings", "repayment", "credit", "other"]
