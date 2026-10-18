@@ -95,4 +95,4 @@ npm run dev
 ---
 
 ## 🔮 What's Next for EquiScore
-We plan to scale EquiScore to support **Offline USSD / SMS Interactivity**. This will allow women in deep rural communities without access to stable data networks or modern smartphones to easily text our accountability bot, query their current inclusive scores, and log loan repayment goals via basic text commands.
+We plan to scale EquiScore to support **Offline USSD  / SMS Interactivity**. This will allow women in deep rural communities without access to stable data networks or modern smartphones to easily text our accountability bot, query their current inclusive scores, and log loan repayment goals via basic text commands.
