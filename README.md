@@ -3,7 +3,7 @@
 > **Track Focus:** Sustainable FinTech & Economic Inclusion (Built for Hack the Valley XI)
 > **Live Site:** [amazing-project-drab.vercel.app](https://vercel.app)
 
-Traditional banks lock out rural women. **EquiScore** fixes this! Using a unified stack of React and localized AI models, we convert alternative micro-enterprise data points into an inclusive, predictive credit wellness score, paired with an active conversational chatbot coach to ensure users build healthy financial habits and remain completely debt-free.
+Traditional banks lock out small businesses and minority groups like women. **EquiScore** fixes this! Using a unified stack of React and localized AI models, we convert alternative micro-enterprise data points into an inclusive, predictive credit wellness score, paired with an active conversational chatbot coach to ensure users build healthy financial habits and remain completely debt-free.
 
 ---
 
@@ -24,7 +24,7 @@ EquiScore breaks away from standard "black-box" risk scoring by tracking borrowe
 
 *   📊 **Alternative Underwriting Engine:** Ingests alternative financial inputs—including exact current savings, daily micro-enterprise profit velocities, localized mobile wallet cadence, and utility bill tracking.
 *   📈 **Repayment Dashboard UI:** A low-friction interface allowing users to easily view their active microloans, track outstanding balances, visualize exact repayment timelines, and watch their creditworthiness grow in real-time.
-*   🤖 **Empathetic AI Financial Assistant:** A local conversational guide optimized to break the cycle of chronic debt. Trained on past cashflow patterns, it gives situational budgeting suggestions, logs friendly repayment timers, and issues structural warnings before cash buffers run low.
+*   🤖 **AI Financial Assistant:** A local conversational guide optimized to break the cycle of chronic debt. Trained on past cashflow patterns, it gives situational budgeting suggestions, logs friendly repayment timers, and issues structural warnings before cash buffers run low.
 
 ---
 
